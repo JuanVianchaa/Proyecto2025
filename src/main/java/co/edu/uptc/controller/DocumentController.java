@@ -1,12 +1,15 @@
 package co.edu.uptc.controller;
 
+
 import co.edu.uptc.model.Document;
 import co.edu.uptc.model.Version;
 import co.edu.uptc.util.FileUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentController {
+
     private Document document;
 
     public DocumentController(String documentName) {
@@ -23,7 +26,7 @@ public class DocumentController {
     }
 
     public void addMainVersion(String id, String content) {
-        Version newVersion = new Version(id, content, true);
+        Version newVersion = new Version(id, content);
         document.addMainVersion(newVersion);
         saveDocument();
     }
@@ -31,14 +34,16 @@ public class DocumentController {
     public void addSubversion(String id, String content, String parentId) {
         Version parent = document.findVersion(parentId);
         if (parent != null) {
-            Version newVersion = new Version(id, content, false);
+            Version newVersion = new Version(id, content);
             document.addSubversion(newVersion, parent);
             saveDocument();
         }
     }
 
     public List<Version> getVersionHistory() {
-        return document.getAllVersions();
+        List<Version> history = new ArrayList<>(document.getAllVersions());
+        history.addAll(document.getDeletedVersions());
+        return history;
     }
 
     public List<Version> getMainVersions() {
@@ -46,12 +51,18 @@ public class DocumentController {
     }
 
     public boolean restoreVersion(String id) {
-        Version version = document.findVersion(id);
+        Version version = document.findDeletedVersion(id);
+
         if (version != null) {
-            document.setCurrentVersion(version);
-            saveDocument();
-            return true;
+            if (version.getParent() == null) {
+                version.setDeleted(false);
+                document.addMainVersion(version);
+                document.getDeletedVersions().remove(version);
+                saveDocument();
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -73,5 +84,9 @@ public class DocumentController {
 
     private void saveDocument() {
         FileUtil.saveDocument(document);
+    }
+
+    public boolean existsVersion(String id) {
+        return document.findVersion(id) != null;
     }
 }

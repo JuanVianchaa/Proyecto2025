@@ -167,6 +167,4 @@ public class ConsoleView {
             }
         }
     }
-
-
 }

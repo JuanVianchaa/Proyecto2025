@@ -11,14 +11,14 @@ public class Version implements Serializable {
     private Date creationDate;
     private Version parent;
     private List<Version> subversions;
-    private boolean isMainVersion;
+    private boolean isDeleted;
 
-    public Version(String id, String content, boolean isMainVersion) {
+    public Version(String id, String content) {
         this.id = id;
         this.content = content;
         this.creationDate = new Date();
         this.subversions = new ArrayList<>();
-        this.isMainVersion = isMainVersion;
+        this.isDeleted = false;
     }
 
     public String getId() {
@@ -27,10 +27,6 @@ public class Version implements Serializable {
 
     public String getContent() {
         return content;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
     }
 
     public Version getParent() {
@@ -45,6 +41,10 @@ public class Version implements Serializable {
         return subversions;
     }
 
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     public void addSubversion(Version subversion) {
         subversion.setParent(this);
         this.subversions.add(subversion);
@@ -55,12 +55,13 @@ public class Version implements Serializable {
     }
 
     public boolean isMainVersion() {
-        return isMainVersion;
+        return parent == null;
     }
 
     @Override
     public String toString() {
-        String versionType = isMainVersion ? "[PRINCIPAL]" : "[SUBVERSIÓN]";
-        return "Versión: " + id + " " + versionType + " - Fecha: " + creationDate;
+        String versionType = isMainVersion() ? "[PRINCIPAL]" : "[SUBVERSIÓN]";
+        String deletedStatus = isDeleted ? " [ELIMINADO]" : "";
+        return "Versión: " + id + " " + versionType + deletedStatus + " - Fecha: " + creationDate;
     }
 }

@@ -8,12 +8,14 @@ public class Document implements Serializable {
     private String name;
     private List<Version> mainVersions;
     private List<Version> allVersions;
+    private List<Version> deletedVersions;
     private Version currentVersion;
 
     public Document(String name) {
         this.name = name;
         this.mainVersions = new ArrayList<>();
         this.allVersions = new ArrayList<>();
+        this.deletedVersions = new ArrayList<>();
     }
 
     public String getName() {
@@ -22,14 +24,6 @@ public class Document implements Serializable {
 
     public List<Version> getMainVersions() {
         return mainVersions;
-    }
-
-    public Version getCurrentVersion() {
-        return currentVersion;
-    }
-
-    public void setCurrentVersion(Version currentVersion) {
-        this.currentVersion = currentVersion;
     }
 
     public void addMainVersion(Version version) {
@@ -50,8 +44,21 @@ public class Document implements Serializable {
         return allVersions;
     }
 
+    public List<Version> getDeletedVersions() {
+        return deletedVersions;
+    }
+
     public Version findVersion(String id) {
         for (Version version : allVersions) {
+            if (version.getId().equals(id)) {
+                return version;
+            }
+        }
+        return null;
+    }
+
+    public Version findDeletedVersion(String id) {
+        for (Version version : deletedVersions) {
             if (version.getId().equals(id)) {
                 return version;
             }
@@ -69,6 +76,8 @@ public class Document implements Serializable {
             }
             allVersions.remove(version);
 
+            version.setDeleted(true);
+            deletedVersions.add(version);
             if (currentVersion == version) {
                 currentVersion = version.getParent();
             }
@@ -76,6 +85,7 @@ public class Document implements Serializable {
         }
         return false;
     }
+
 
     public List<Version> getPreOrderTraversal() {
         List<Version> result = new ArrayList<>();
