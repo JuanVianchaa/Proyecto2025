@@ -7,7 +7,6 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Intentar establecer el look and feel del sistema
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
