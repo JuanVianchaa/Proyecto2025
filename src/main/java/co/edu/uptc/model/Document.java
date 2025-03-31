@@ -86,7 +86,6 @@ public class Document implements Serializable {
         return false;
     }
 
-
     public List<Version> getPreOrderTraversal() {
         List<Version> result = new ArrayList<>();
         for (Version mainVersion : mainVersions) {
